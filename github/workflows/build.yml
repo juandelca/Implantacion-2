@@ -1,5 +1,4 @@
 name: Build Civil 3D Plugin
-
 on: [push]
 
 jobs:
@@ -7,39 +6,29 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    # ... (pasos 1-4 sin cambios) ...
-
-    # 1. Descarga tu código
+    # 1. Descarga tu repositorio
     - name: Checkout repository
       uses: actions/checkout@v4
 
     # 2. Configura msbuild
     - name: Setup .NET Framework (msbuild)
       uses: microsoft/setup-msbuild@v1
-      
+
     # 3. Configura NuGet
     - name: Setup NuGet
       uses: NuGet/setup-nuget@v2
 
-    # 4. Restaura el paquete (Newtonsoft.Json)
+    # 4. Restaura los paquetes (usa la ruta de tu imagen)
     - name: Restore NuGet packages
       run: nuget restore ${{ github.workspace }}\Implantacion\Civil3D_Phase1.csproj
-
-    # 5. Compila el proyecto
-    # --- RUTA CORREGIDA ---
+      
+    # 5. Compila el proyecto (usa la ruta de tu imagen y plataforma x64)
     - name: Build project
-      run: msbuild ${{ github.workspace }}\Implantacion\Civil3D_Phase1.csproj /p:Configuration=Release /p:Platform=x64 # <-- CAMBIO DE AnyCPU a x64
+      run: msbuild ${{ github.workspace }}\Implantacion\Civil3D_Phase1.csproj /p:Configuration=Release /p:Platform=x64
 
-    # 6. Comprime la carpeta de salida
-    # --- RUTA CORREGIDA ---
-    - name: Zip Release folder
-      run: |
-        Compress-Archive -Path ${{ github.workspace }}\Implantacion\bin\Release\* -DestinationPath ${{ github.workspace }}\Release.zip
-      shell: powershell
-
-    # 7. Sube el artefacto .zip
-    - name: Upload Full Release Artifact
+    # 6. Sube la DLL
+    - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Civil3D-Phase1-FullRelease
-        path: ${{ github.workspace }}\Release.zip
+        name: Civil3D-Phase1-DLL
+        path: ${{ github.workspace }}\Implantacion\bin\Release\Civil3D_Phase1.dll
